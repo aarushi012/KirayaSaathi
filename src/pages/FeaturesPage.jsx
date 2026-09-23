@@ -11,11 +11,12 @@ import {
   ArrowRight, 
   Zap, 
   CheckCircle2, 
-  XCircle,
-  MapPin,
-  Lock,
-  Eye,
-  Scale
+  XCircle, 
+  MapPin, 
+  Lock, 
+  Eye, 
+  Scale,
+  UploadCloud
 } from 'lucide-react';
 import { apply3DTilt, reset3DTilt } from '../utils/tilt3d';
 

@@ -159,9 +159,9 @@ export default function App() {
   };
 
   const commonUploadProps = {
-    onFileSelected,
-    onSampleSelected,
-    onTextSubmit,
+    onFileSelected: handleFileSelected,
+    onSampleSelected: handleSampleSelected,
+    onTextSubmit: handleTextSubmit,
     onTryDemo: handleTryDemo,
     isProcessing,
     uploadError,
