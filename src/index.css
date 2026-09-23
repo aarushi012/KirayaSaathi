@@ -1,0 +1,581 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16.5px;
+}
+
+body {
+  font-size: 1.025rem;
+  line-height: 1.62;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings with clear, modern weights and proportions */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   Global UI Selection & Cursor Behavior:
+   Disables accidental text selection & text caret on UI double-clicks
+   while preserving full selection, typing, and editing for inputs/textareas.
+   ========================================================================== */
+
+/* Disable text selection across all website UI elements */
+body,
+button,
+nav,
+header,
+section,
+footer,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+label,
+svg,
+img,
+li,
+ul,
+ol,
+dt,
+dd,
+blockquote,
+article,
+aside,
+main,
+.card,
+.badge,
+.glass-panel,
+.glass-card {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Ensure interactive elements have pointer cursor */
+button,
+a,
+select,
+[role="button"],
+.cursor-pointer,
+.cursor-pointer *,
+nav a,
+nav button,
+label.cursor-pointer {
+  cursor: pointer !important;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* IMPORTANT EXCEPTION: Keep text selection and typing enabled in inputs, textareas, and editable fields */
+input,
+textarea,
+[contenteditable="true"],
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="search"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  cursor: text !important;
+}
+
+/* Text selection highlight only inside active inputs and textareas */
+input::selection,
+textarea::selection,
+[contenteditable="true"]::selection {
+  background: rgba(99, 102, 241, 0.45);
+  color: #ffffff;
+}
+
+input::-moz-selection,
+textarea::-moz-selection,
+[contenteditable="true"]::-moz-selection {
+  background: rgba(99, 102, 241, 0.45);
+  color: #ffffff;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(18, 29, 51, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(130, 150, 190, 0.35);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+.glass-panel {
+  background: rgba(27, 41, 66, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(130, 150, 190, 0.18);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(32, 47, 73, 0.85) 0%, rgba(27, 41, 66, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(130, 150, 190, 0.18);
+}
+
+/* ==========================================================================
+   Clean Fade & Slide Utility
+   ========================================================================== */
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scanBeam {
+  0% {
+    top: 5%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 92%;
+    opacity: 0;
+  }
+}
+
+.animate-scanBeam {
+  animation: scanBeam 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroScan {
+  0% {
+    top: -10%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+.animate-heroScan {
+  animation: heroScan 7s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-3deg);
+  }
+}
+
+.animate-floatSlow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(3deg);
+  }
+  50% {
+    transform: translateY(8px) rotate(4deg);
+  }
+}
+
+.animate-floatReverse {
+  animation: floatReverse 9s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 0.12;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1.06);
+  }
+}
+
+.animate-pulseSlow {
+  animation: pulseSlow 10s ease-in-out infinite;
+}
+
+@keyframes buttonLightSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.group:hover .animate-sweep {
+  animation: buttonLightSweep 0.75s ease-out forwards;
+}
+
+@keyframes dotBreathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.7);
+  }
+}
+
+.animate-dotBreathing {
+  animation: dotBreathing 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes dotLiveBreathing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 0 8px 2px rgba(16, 185, 129, 0.7);
+  }
+}
+
+.animate-dotLiveBreathing {
+  animation: dotLiveBreathing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes mobileDrawerOpen {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-drawer {
+  animation: mobileDrawerOpen 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modalIn {
+  animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sectionHighlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    border-color: rgba(99, 102, 241, 0.2);
+  }
+  30% {
+    box-shadow: 0 0 25px 4px rgba(99, 102, 241, 0.35);
+    border-color: rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 20px 2px rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    border-color: rgba(99, 102, 241, 0.2);
+  }
+}
+
+.section-highlight-active {
+  animation: sectionHighlightPulse 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes resultCardScanSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+.animate-resultCardScan {
+  animation: resultCardScanSweep 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes heroBadgeEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-heroBadge {
+  animation: heroBadgeEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroHeadingEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-heroHeading {
+  animation: heroHeadingEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s backwards;
+}
+
+@keyframes heroSubtitleEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-heroSubtitle {
+  animation: heroSubtitleEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.28s backwards;
+}
+
+@keyframes heroCtaEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-heroCta {
+  animation: heroCtaEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.42s backwards;
+}
+
+@keyframes heroTrustEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-heroTrust-1 {
+  animation: heroTrustEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.56s backwards;
+}
+
+.animate-heroTrust-2 {
+  animation: heroTrustEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.68s backwards;
+}
+
+.animate-heroTrust-3 {
+  animation: heroTrustEntrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.8s backwards;
+}
+
+@keyframes dotSoftPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 1;
+    box-shadow: 0 0 6px 1px rgba(129, 140, 248, 0.7);
+  }
+}
+
+.animate-dotSoftPulse {
+  animation: dotSoftPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes analyzeFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes analyzeBadgeEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-analyzeBadge {
+  animation: analyzeBadgeEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-analyzeHeading {
+  animation: analyzeFadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+}
+
+.animate-analyzeSubtitle {
+  animation: analyzeFadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.16s backwards;
+}
+
+.animate-analyzeDemoCard {
+  animation: analyzeFadeSlideUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.24s backwards;
+}
+
+.animate-analyzeTabs {
+  animation: analyzeFadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s backwards;
+}
+
+.animate-analyzeUploadCard {
+  animation: analyzeFadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
+}
+
+@keyframes sparklePulseOnce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.22) rotate(12deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-sparkleOnce {
+  animation: sparklePulseOnce 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-scanBeam,
+  .animate-resultCardScan,
+  .animate-fadeIn,
+  .animate-heroScan,
+  .animate-floatSlow,
+  .animate-floatReverse,
+  .animate-pulseSlow,
+  .animate-dotBreathing,
+  .animate-dotLiveBreathing,
+  .animate-dotSoftPulse,
+  .animate-drawer,
+  .animate-modalIn,
+  .section-highlight-active,
+  .animate-sweep,
+  .animate-heroBadge,
+  .animate-heroHeading,
+  .animate-heroSubtitle,
+  .animate-heroCta,
+  .animate-heroTrust-1,
+  .animate-heroTrust-2,
+  .animate-heroTrust-3,
+  .animate-analyzeBadge,
+  .animate-analyzeHeading,
+  .animate-analyzeSubtitle,
+  .animate-analyzeDemoCard,
+  .animate-analyzeTabs,
+  .animate-analyzeUploadCard,
+  .animate-sparkleOnce {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+
+
+
+
+
