@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Scale, Bot, Zap, Menu, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Sparkles, Scale, Zap, Menu, X, ShieldCheck } from 'lucide-react';
 import { getActiveApiKey } from '../services/aiService';
-import { playSectionAnimation } from '../utils/animationManager';
 
-export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryDemo, onOpenStatusModal, onOpenDemoModal }) {
+export default function Header({ 
+  onReset, 
+  onOpenKeyModal, 
+  onTryDemo, 
+  onOpenStatusModal, 
+  onOpenDemoModal 
+}) {
   const isLiveAI = Boolean(getActiveApiKey());
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showStatusTooltip, setShowStatusTooltip] = useState(false);
   
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Magnetic effect for Primary Analyze CTA
   const analyzeBtnRef = useRef(null);
   const [magneticOffset, setMagneticOffset] = useState({ x: 0, y: 0 });
@@ -25,32 +33,11 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Active section detection via IntersectionObserver
+  // Close mobile drawer on route change
   useEffect(() => {
-    const sectionIds = ['home', 'analyze', 'how-it-works', 'features'];
-    const sections = sectionIds
-      .map(id => document.getElementById(id))
-      .filter(Boolean);
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-    );
-
-    sections.forEach(sec => observer.observe(sec));
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Handle subtle magnetic interaction for Primary Analyze Button
   const handleAnalyzeMouseMove = (e) => {
     if (window.innerWidth < 768) return;
     const btn = analyzeBtnRef.current;
@@ -60,7 +47,6 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Magnetic offset 2-4px
     const moveX = ((x - rect.width / 2) / (rect.width / 2)) * 3.5;
     const moveY = ((y - rect.height / 2) / (rect.height / 2)) * 3.5;
 
@@ -78,33 +64,12 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
   };
 
   const navItems = [
-    { id: 'home', label: 'Home', href: '#home' },
-    { id: 'analyze', label: 'Analyze', href: '#analyze' },
-    { id: 'how-it-works', label: 'How It Works', href: '#how-it-works' },
-    { id: 'features', label: 'Features', href: '#features' }
+    { id: 'home', label: 'Home', path: '/' },
+    { id: 'analyze', label: 'Analyze', path: '/analyze' },
+    { id: 'how-it-works', label: 'How It Works', path: '/how-it-works' },
+    { id: 'features', label: 'Features', path: '/features' },
+    { id: 'about', label: 'About', path: '/about' }
   ];
-
-  const handleNavClick = (e, href) => {
-    e.preventDefault();
-    setIsMobileMenuOpen(false);
-
-    const targetId = href.replace('#', '');
-    if (targetId === 'home' && onReset) {
-      onReset();
-    }
-
-    playSectionAnimation(targetId);
-  };
-
-  const handleLogoClick = () => {
-    if (onReset) onReset();
-    playSectionAnimation('home');
-  };
-
-  const handleAnalyzeButtonClick = (e) => {
-    if (onAnalyzeClick) onAnalyzeClick();
-    playSectionAnimation('analyze');
-  };
 
   return (
     <header 
@@ -118,17 +83,16 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
         <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* LOGO & BRAND SECTION */}
-          <div 
-            onClick={handleLogoClick}
+          <Link 
+            to="/"
+            onClick={() => {
+              if (onReset) onReset();
+            }}
             className="flex items-center gap-3 cursor-pointer group select-none transition-all duration-200 hover:-translate-y-[1px] active:scale-[0.98] shrink-0"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogoClick()}
             aria-label="KirayaSaathi Home"
           >
             {/* Legal Scales Icon in Premium Rounded Square */}
             <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-b from-[#1B2942] to-[#142039] p-[1px] border border-indigo-500/30 group-hover:border-indigo-400/60 shadow-md shadow-black/30 group-hover:shadow-indigo-500/20 transition-all duration-200 shrink-0 flex items-center justify-center overflow-hidden">
-              {/* Subtle Ambient Hover Glow */}
               <div className="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
               <Scale className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-200" />
             </div>
@@ -136,53 +100,51 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
             {/* Brand Title & Supporting Info */}
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2 sm:gap-2.5">
-                {/* Primary Project Name: KirayaSaathi */}
                 <span className="font-extrabold text-lg sm:text-xl tracking-tight leading-none text-[#F8FAFC] font-sans transition-colors duration-200">
                   Kiraya<span className="bg-gradient-to-r from-indigo-400 via-indigo-300 to-blue-400 bg-clip-text text-transparent group-hover:from-indigo-300 group-hover:to-cyan-300 transition-all duration-200">Saathi</span>
                 </span>
 
-                {/* Secondary AI Legal Assistant Badge */}
                 <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/25 shadow-xs hidden xs:inline-flex">
                   AI Legal Assistant
                 </span>
               </div>
 
-              {/* Tagline */}
               <p className="text-[11px] text-[#8FA0B8] font-medium tracking-normal mt-1 leading-none hidden sm:block">
                 Tenant-First Contract Insights
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* DESKTOP NAVIGATION ITEMS */}
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
             {navItems.map((item) => {
-              const isActive = activeSection === item.id;
+              const isActive = item.path === '/' 
+                ? location.pathname === '/' 
+                : location.pathname.startsWith(item.path);
+
               return (
-                <a
+                <NavLink
                   key={item.id}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
+                  to={item.path}
+                  end={item.path === '/'}
                   className={`relative px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-200 group flex items-center gap-1.5 ${
                     isActive 
                       ? 'text-[#F8FAFC]' 
                       : 'text-[#B8C4D6] hover:text-[#F8FAFC]'
                   }`}
                 >
-                  {/* Subtle active glowing indicator dot */}
                   {isActive && (
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)] animate-pulse" />
                   )}
 
                   <span>{item.label}</span>
 
-                  {/* Animated Center-Out Expanding Underline */}
                   <span 
                     className={`absolute bottom-0.5 left-3 right-3 h-[2px] rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-transform duration-300 origin-center ${
                       isActive ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-75'
                     }`} 
                   />
-                </a>
+                </NavLink>
               );
             })}
           </nav>
@@ -190,7 +152,7 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
           {/* RIGHT ACTION CONTROLS */}
           <div className="flex items-center gap-2 sm:gap-3">
             
-            {/* TRY DEMO BUTTON (Secondary CTA) */}
+            {/* TRY DEMO BUTTON */}
             <button
               type="button"
               onClick={onOpenDemoModal || onTryDemo}
@@ -201,7 +163,7 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
               <span>Try Demo</span>
             </button>
 
-            {/* DEMO ENGINE / LIVE AI STATUS PILL & HOVER TOOLTIP */}
+            {/* DEMO ENGINE / LIVE AI STATUS PILL */}
             <div className="relative hidden sm:block">
               <button
                 type="button"
@@ -227,7 +189,6 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
                 )}
               </button>
 
-              {/* Status Mini Tooltip */}
               {showStatusTooltip && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 rounded-lg bg-[#1B2942] border border-[rgba(130,150,190,0.25)] text-[11px] text-[#E2E8F0] shadow-xl backdrop-blur-md whitespace-nowrap z-50 pointer-events-none animate-fadeIn">
                   <div className="flex items-center gap-1.5">
@@ -238,11 +199,11 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
               )}
             </div>
 
-            {/* PRIMARY "ANALYZE" CTA WITH MAGNETIC & AI SCANNING EFFECT */}
+            {/* PRIMARY "ANALYZE" CTA */}
             <button
               ref={analyzeBtnRef}
               type="button"
-              onClick={handleAnalyzeButtonClick}
+              onClick={() => navigate('/analyze')}
               onMouseMove={handleAnalyzeMouseMove}
               onMouseLeave={handleAnalyzeMouseLeave}
               style={{
@@ -250,7 +211,6 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
               }}
               className="relative inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 border border-indigo-400/30 shadow-md shadow-indigo-600/30 hover:shadow-xl hover:shadow-indigo-600/50 transition-all duration-200 active:scale-[0.97] overflow-hidden group cursor-pointer"
             >
-              {/* Internal Cursor Following Glow */}
               <div 
                 className="absolute inset-0 pointer-events-none transition-opacity duration-300"
                 style={{
@@ -258,8 +218,6 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
                   opacity: cursorGlow.opacity
                 }}
               />
-
-              {/* AI Scanning Light Sweep Line on Hover */}
               <div className="absolute top-0 bottom-0 w-8 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none animate-sweep" />
 
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-indigo-200 group-hover:text-cyan-100 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-200" />
@@ -289,12 +247,15 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
           <div className="md:hidden pt-3 pb-4 border-t border-[rgba(130,150,190,0.15)] animate-drawer space-y-3">
             <div className="grid grid-cols-2 gap-1.5">
               {navItems.map((item) => {
-                const isActive = activeSection === item.id;
+                const isActive = item.path === '/' 
+                  ? location.pathname === '/' 
+                  : location.pathname.startsWith(item.path);
+
                 return (
-                  <a
+                  <Link
                     key={item.id}
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href)}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between ${
                       isActive 
                         ? 'bg-indigo-600/25 text-indigo-200 border border-indigo-500/35' 
@@ -303,7 +264,7 @@ export default function Header({ onAnalyzeClick, onReset, onOpenKeyModal, onTryD
                   >
                     <span>{item.label}</span>
                     {isActive && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />}
-                  </a>
+                  </Link>
                 );
               })}
             </div>

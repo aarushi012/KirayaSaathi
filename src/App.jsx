@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import Header from './components/Header';
-import HeroSection from './components/HeroSection';
-import UploadSection from './components/UploadSection';
-import HowItWorks from './components/HowItWorks';
-import FeaturesSection from './components/FeaturesSection';
-import ResultsDashboard from './components/ResultsDashboard';
+import ScrollToTop from './components/ScrollToTop';
+import HomePage from './pages/HomePage';
+import AnalyzePage from './pages/AnalyzePage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import FeaturesPage from './pages/FeaturesPage';
+import AboutPage from './pages/AboutPage';
+import ResultsPage from './pages/ResultsPage';
 import DisclaimerBanner from './components/DisclaimerBanner';
 import NegotiationSummaryModal from './components/NegotiationSummaryModal';
 import APIKeyModal from './components/APIKeyModal';
 import AIAnalysisLoadingScreen from './components/AIAnalysisLoadingScreen';
 import DemoLaunchModal from './components/DemoLaunchModal';
 import DemoEngineStatusModal from './components/DemoEngineStatusModal';
-import AboutSection from './components/AboutSection';
 import VideoBackground from './components/VideoBackground';
 import { extractTextFromPDF } from './utils/pdfExtractor';
 import { analyzeAgreementWithAI } from './services/aiService';
 import { BUNDLED_DEMO_AGREEMENT_TEXT, PREDEFINED_DEMO_ANALYSIS } from './data/sampleAgreements';
 import { getJurisdictionById, DEFAULT_STATE_ID } from './data/jurisdictions';
-import { playSectionAnimation } from './utils/animationManager';
 import { Scale } from 'lucide-react';
 
 function formatFileSize(bytes) {
@@ -29,6 +30,7 @@ function formatFileSize(bytes) {
 }
 
 export default function App() {
+  const navigate = useNavigate();
   const [analysisResult, setAnalysisResult] = useState(null);
   const [stagedResult, setStagedResult] = useState(null);
   const [analyzingFileMeta, setAnalyzingFileMeta] = useState({ name: 'rental_agreement.pdf', size: null });
@@ -145,7 +147,7 @@ export default function App() {
       setAnalysisResult(stagedResult);
       setIsProcessing(false);
       setStagedResult(null);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/results');
     }
   };
 
@@ -154,27 +156,32 @@ export default function App() {
     setStagedResult(null);
     setIsProcessing(false);
     setUploadError('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const scrollToSection = (id) => {
-    if (analysisResult) {
-      setAnalysisResult(null);
-    }
-    setTimeout(() => {
-      playSectionAnimation(id);
-    }, 50);
+  const commonUploadProps = {
+    onFileSelected,
+    onSampleSelected,
+    onTextSubmit,
+    onTryDemo: handleTryDemo,
+    isProcessing,
+    uploadError,
+    onClearError: () => setUploadError(''),
+    selectedStateId,
+    onSelectState: setSelectedStateId,
+    setIsDemoModalOpen
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#121D33] text-slate-100 font-sans selection:bg-indigo-500 selection:text-white relative">
       
+      {/* Auto scroll to top when changing route */}
+      <ScrollToTop />
+
       {/* Global Full-Screen Cinematic Video Background */}
       <VideoBackground />
 
       {/* Header */}
       <Header
-        onAnalyzeClick={() => scrollToSection('analyze')}
         onReset={handleReset}
         onOpenKeyModal={() => setIsKeyModalOpen(true)}
         onTryDemo={handleTryDemo}
@@ -182,49 +189,35 @@ export default function App() {
         onOpenStatusModal={() => setIsStatusModalOpen(true)}
       />
 
-      {/* Main Content Area */}
+      {/* Main Multi-Page Routed Content Area */}
       <main className="flex-1 relative z-10">
-        {analysisResult ? (
-          /* Dedicated AI Results Dashboard */
-          <ResultsDashboard
-            analysisData={analysisResult}
-            rawExtractedText={extractedRawText}
-            onBackToUpload={handleReset}
-            onOpenNegotiationModal={() => setIsNegotiationModalOpen(true)}
-            onOpenKeyModal={() => setIsKeyModalOpen(true)}
-            onTryDemo={handleTryDemo}
-            selectedStateId={selectedStateId}
-            onSelectState={setSelectedStateId}
+        <Routes>
+          <Route path="/" element={<HomePage {...commonUploadProps} />} />
+          <Route path="/analyze" element={<AnalyzePage {...commonUploadProps} />} />
+          <Route path="/how-it-works" element={<HowItWorksPage onTryDemo={handleTryDemo} />} />
+          <Route path="/features" element={<FeaturesPage onTryDemo={handleTryDemo} />} />
+          <Route path="/about" element={<AboutPage onTryDemo={handleTryDemo} />} />
+          <Route 
+            path="/results" 
+            element={
+              <ResultsPage
+                analysisResult={analysisResult}
+                rawExtractedText={extractedRawText}
+                onBackToUpload={() => {
+                  handleReset();
+                  navigate('/analyze');
+                }}
+                onOpenNegotiationModal={() => setIsNegotiationModalOpen(true)}
+                onOpenKeyModal={() => setIsKeyModalOpen(true)}
+                onTryDemo={handleTryDemo}
+                selectedStateId={selectedStateId}
+                onSelectState={setSelectedStateId}
+              />
+            } 
           />
-        ) : (
-          /* Landing & Upload Flow */
-          <>
-            <HeroSection
-              onAnalyzeClick={() => scrollToSection('analyze')}
-              onHowItWorksClick={() => scrollToSection('how-it-works')}
-              onTryDemo={() => setIsDemoModalOpen(true)}
-            />
-
-            <UploadSection
-              onFileSelected={handleFileSelected}
-              onSampleSelected={handleSampleSelected}
-              onTextSubmit={handleTextSubmit}
-              onTryDemo={() => setIsDemoModalOpen(true)}
-              isProcessing={isProcessing}
-              externalError={uploadError}
-              onClearError={() => setUploadError('')}
-              selectedStateId={selectedStateId}
-              onSelectState={setSelectedStateId}
-            />
-
-            <HowItWorks />
-
-            <FeaturesSection />
-
-            {/* About / Mission Section */}
-            <AboutSection />
-          </>
-        )}
+          {/* Catch-all fallback route */}
+          <Route path="*" element={<HomePage {...commonUploadProps} />} />
+        </Routes>
       </main>
 
       {/* Persistent Disclaimer Banner */}
@@ -236,12 +229,19 @@ export default function App() {
           <div className="flex items-center gap-2">
             <Scale className="w-4 h-4 text-indigo-400" />
             <span className="font-bold text-[#F8FAFC]">KirayaSaathi</span>
-            <span className="text-[#8FA0B8]">• College Hackathon MVP</span>
+            <span className="text-[#8FA0B8]">• Tenant Empowerment AI</span>
           </div>
+
           <div className="flex items-center gap-4 text-[#B8C4D6]">
-            <span>Private & In-Browser</span>
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
             <span>•</span>
-            <span>Tenant Empowerment Project</span>
+            <Link to="/analyze" className="hover:text-white transition-colors">Analyze</Link>
+            <span>•</span>
+            <Link to="/how-it-works" className="hover:text-white transition-colors">How It Works</Link>
+            <span>•</span>
+            <Link to="/features" className="hover:text-white transition-colors">Features</Link>
+            <span>•</span>
+            <Link to="/about" className="hover:text-white transition-colors">About</Link>
           </div>
         </div>
       </footer>
@@ -286,9 +286,7 @@ export default function App() {
       <APIKeyModal
         isOpen={isKeyModalOpen}
         onClose={() => setIsKeyModalOpen(false)}
-        onKeyUpdated={() => {
-          // Re-trigger update if needed
-        }}
+        onKeyUpdated={() => {}}
       />
 
     </div>
